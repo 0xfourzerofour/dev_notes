@@ -29,7 +29,6 @@ lazy_static! {
     };
 }
 
-/// Load all saved quests from file
 pub fn load_projects() -> Result<Vec<Project>, io::Error> {
     if !Path::new(PROJ_PATHS.data_path.as_path()).exists() {
         fs::File::create(PROJ_PATHS.data_path.as_path())?;

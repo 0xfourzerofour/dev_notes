@@ -42,26 +42,8 @@ pub struct App {
     pub running: bool,
     pub selected_panel: Panels,
     pub input_mode: InputMode,
-    pub projects: Vec<Project>,
-    pub selected_project: u32,
+    pub projects: StatefulList<Project>,
 }
-
-// impl Default for App {
-//     fn default() -> Self {
-//         Self {
-//             running: true,
-//             selected_panel: Panels::SideBar,
-//             input_mode: InputMode::Normal,
-//             projects: [Project {
-//                 title: String::from("HELLO"),
-//                 dev_items: Vec::new(),
-//                 updated_at: String::from(""),
-//             }]
-//             .to_vec(),
-//             selected_project: 0,
-//         }
-//     }
-// }
 
 impl App {
     /// Constructs a new instance of [`App`].
@@ -70,8 +52,7 @@ impl App {
             running: true,
             selected_panel: Panels::SideBar,
             input_mode: InputMode::Normal,
-            projects,
-            selected_project: 0,
+            projects: StatefulList::with_items(projects),
         }
     }
 
@@ -85,6 +66,7 @@ impl App {
         let items = self.projects.clone();
 
         let projects = items
+            .items
             .into_iter()
             .map(|p| ListItem::new(p.title))
             .collect::<Vec<ListItem>>();
@@ -95,7 +77,7 @@ impl App {
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">>");
 
-        frame.render_widget(project_list, chunks[0]);
+        frame.render_stateful_widget(project_list, chunks[0], &mut self.projects.state);
 
         let items = [
             ListItem::new("Project Esign"),

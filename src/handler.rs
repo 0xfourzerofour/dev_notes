@@ -1,4 +1,7 @@
-use crate::app::{App, AppResult, InputMode};
+use crate::{
+    app::{App, AppResult, InputMode},
+    projects::Project,
+};
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 /// Handles the key events and updates the state of [`App`] depending on the input_mode.
@@ -13,8 +16,11 @@ pub fn handle_key_events(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
 fn handle_normal_mode(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_event.code {
         KeyCode::Char('i') => app.input_mode = InputMode::Insert,
-        KeyCode::Char('j') | KeyCode::Down => {
-            print!("DOWN");
+        KeyCode::Char('j') | KeyCode::Down => app.projects.next(),
+        KeyCode::Char('k') | KeyCode::Up => app.projects.previous(),
+
+        KeyCode::Char('n') => {
+            print!("NEW")
         }
 
         // exit application on Ctrl-D
@@ -32,6 +38,12 @@ fn handle_insert_mode(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
     match key_event.code {
         // exit application on ESC
         KeyCode::Esc => app.input_mode = InputMode::Normal,
+
+        KeyCode::Enter => app.projects.items.push(Project {
+            title: String::from("test title"),
+            dev_items: Vec::new(),
+            updated_at: chrono::Local::now().to_string(),
+        }),
         _ => {}
     }
     Ok(())

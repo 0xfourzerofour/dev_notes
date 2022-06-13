@@ -34,7 +34,7 @@ fn main() -> AppResult<()> {
         }
     }
 
-    save_projects(&app.projects)?;
+    save_projects(&app.projects.items)?;
 
     // Exit the user interface.
     tui.exit()?;
