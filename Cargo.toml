@@ -2,7 +2,7 @@
 name = "dev_notes"
 version = "0.1.0"
 authors = ["joshua pauline"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 crossterm = "0.21.0"

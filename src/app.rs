@@ -1,10 +1,13 @@
+use core::fmt::{Display, Formatter, Result};
 use std::error;
+use std::mem::{replace, swap, take};
 use tui::backend::Backend;
 use tui::layout::{Alignment, Constraint, Direction, Layout};
 use tui::style::{Color, Modifier, Style};
 use tui::terminal::Frame;
 use tui::widgets::{Block, Borders, List, ListItem, Paragraph};
 
+use crate::projects::{Project, StatefulList};
 use crate::widgets;
 
 /// Application result type.
@@ -18,24 +21,19 @@ pub enum InputMode {
     Insert,
 }
 
+impl Display for InputMode {
+    fn fmt(&self, f: &mut Formatter) -> Result {
+        match self {
+            InputMode::Normal => write!(f, "NORMAL"),
+            InputMode::Insert => write!(f, "INSERT"),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Panels {
     SideBar,
     NotePad,
-}
-
-#[derive(Debug)]
-pub struct Item {
-    title: String,
-    description: String,
-    finished: bool,
-}
-
-#[derive(Debug)]
-pub struct Project {
-    title: String,
-    dev_items: Vec<Item>,
-    selected_item: u32,
 }
 
 /// Application.
@@ -44,26 +42,37 @@ pub struct App {
     pub running: bool,
     pub selected_panel: Panels,
     pub input_mode: InputMode,
-    pub projects: Option<Vec<Project>>,
+    pub projects: Vec<Project>,
     pub selected_project: u32,
 }
 
-impl Default for App {
-    fn default() -> Self {
+// impl Default for App {
+//     fn default() -> Self {
+//         Self {
+//             running: true,
+//             selected_panel: Panels::SideBar,
+//             input_mode: InputMode::Normal,
+//             projects: [Project {
+//                 title: String::from("HELLO"),
+//                 dev_items: Vec::new(),
+//                 updated_at: String::from(""),
+//             }]
+//             .to_vec(),
+//             selected_project: 0,
+//         }
+//     }
+// }
+
+impl App {
+    /// Constructs a new instance of [`App`].
+    pub fn new(projects: Vec<Project>) -> Self {
         Self {
             running: true,
             selected_panel: Panels::SideBar,
             input_mode: InputMode::Normal,
-            projects: None,
+            projects,
             selected_project: 0,
         }
-    }
-}
-
-impl App {
-    /// Constructs a new instance of [`App`].
-    pub fn new() -> Self {
-        Self::default()
     }
 
     /// Handles the tick event of the terminal.
@@ -71,24 +80,22 @@ impl App {
 
     /// Renders the user interface widgets.
     pub fn render<B: Backend>(&mut self, frame: &mut Frame<'_, B>) {
-        let chunks = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(15), Constraint::Percentage(85)].as_ref())
-            .split(frame.size());
+        let chunks = widgets::main_chunks(frame.size());
 
-        let items = [
-            ListItem::new("Project Esign"),
-            ListItem::new("Company Dash"),
-            ListItem::new("New pro"),
-        ];
+        let items = self.projects.clone();
 
-        let list = List::new(items)
+        let projects = items
+            .into_iter()
+            .map(|p| ListItem::new(p.title))
+            .collect::<Vec<ListItem>>();
+
+        let project_list = List::new(projects)
             .block(Block::default().title("Projects").borders(Borders::ALL))
             .style(Style::default().fg(Color::White))
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">>");
 
-        frame.render_widget(list, chunks[0]);
+        frame.render_widget(project_list, chunks[0]);
 
         let items = [
             ListItem::new("Project Esign"),

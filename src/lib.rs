@@ -4,6 +4,9 @@ pub mod app;
 /// Project implementations.
 pub mod projects;
 
+/// Project implementations.
+pub mod file_handler;
+
 /// Terminal events handler.
 pub mod event;
 
