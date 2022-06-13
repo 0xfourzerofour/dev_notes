@@ -7,7 +7,7 @@ use tui::style::{Color, Modifier, Style};
 use tui::terminal::Frame;
 use tui::widgets::{Block, Borders, List, ListItem, Paragraph};
 
-use crate::projects::{Project, StatefulList};
+use crate::projects::{Item, Project, StatefulList};
 use crate::widgets;
 
 /// Application result type.
@@ -79,18 +79,21 @@ impl App {
 
         frame.render_stateful_widget(project_list, chunks[0], &mut self.projects.state);
 
-        let items = [
-            ListItem::new("Project Esign"),
-            ListItem::new("Company Dash"),
-            ListItem::new("New pro"),
-        ];
+        let items_1 = &self.projects.items[self.projects.state.selected().unwrap_or(0)];
 
-        let list = List::new(items)
+        let project_items = items_1
+            .clone()
+            .dev_items
+            .into_iter()
+            .map(|d| ListItem::new(d.title))
+            .collect::<Vec<ListItem>>();
+
+        let project_list = List::new(project_items)
             .block(Block::default().title("Items").borders(Borders::ALL))
             .style(Style::default().fg(Color::White))
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">>");
 
-        frame.render_widget(list, chunks[1]);
+        frame.render_stateful_widget(project_list, chunks[1], &mut self.projects.state);
     }
 }

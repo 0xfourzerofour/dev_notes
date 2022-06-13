@@ -1,6 +1,6 @@
 use crate::{
     app::{App, AppResult, InputMode},
-    projects::Project,
+    projects::{Item, Project},
 };
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
@@ -39,11 +39,13 @@ fn handle_insert_mode(key_event: KeyEvent, app: &mut App) -> AppResult<()> {
         // exit application on ESC
         KeyCode::Esc => app.input_mode = InputMode::Normal,
 
-        KeyCode::Enter => app.projects.items.push(Project {
-            title: String::from("test title"),
-            dev_items: Vec::new(),
-            updated_at: chrono::Local::now().to_string(),
-        }),
+        KeyCode::Enter => app.projects.items[app.projects.state.selected().unwrap_or(0)]
+            .dev_items
+            .push(Item {
+                title: String::from("test title"),
+                description: String::from("ewtewtew"),
+                finished: false,
+            }),
         _ => {}
     }
     Ok(())

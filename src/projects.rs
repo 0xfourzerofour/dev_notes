@@ -3,9 +3,9 @@ use tui::widgets::ListState;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Item {
-    title: String,
-    description: String,
-    finished: bool,
+    pub title: String,
+    pub description: String,
+    pub finished: bool,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
