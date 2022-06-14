@@ -43,16 +43,24 @@ pub struct App {
     pub selected_panel: Panels,
     pub input_mode: InputMode,
     pub projects: StatefulList<Project>,
+    pub item_list: StatefulList<Item>,
 }
 
 impl App {
     /// Constructs a new instance of [`App`].
     pub fn new(projects: Vec<Project>) -> Self {
+        let proj_clone = projects.clone();
+
+        let item_1 = &*proj_clone[0].dev_items;
+
+        println!("{:?}", item_1);
+
         Self {
             running: true,
             selected_panel: Panels::SideBar,
             input_mode: InputMode::Normal,
             projects: StatefulList::with_items(projects),
+            item_list: StatefulList::with_items(item_1.clone().to_vec()),
         }
     }
 
@@ -61,7 +69,14 @@ impl App {
 
     /// Renders the user interface widgets.
     pub fn render<B: Backend>(&mut self, frame: &mut Frame<'_, B>) {
-        let chunks = widgets::main_chunks(frame.size());
+        let header_main = widgets::header_and_main(frame.size());
+        let chunks = widgets::main_chunks(header_main[1]);
+        let sb_chunks = widgets::sidebar_chunks(chunks[0]);
+
+        let mode = Paragraph::new(format!("{}", self.input_mode))
+            .block(Block::default().title("MODE").borders(Borders::ALL));
+
+        frame.render_widget(mode, sb_chunks[0]);
 
         let items = self.projects.clone();
 
@@ -71,29 +86,36 @@ impl App {
             .map(|p| ListItem::new(p.title))
             .collect::<Vec<ListItem>>();
 
+        let mut sb_color = Color::White;
+        let mut main_color = Color::Yellow;
+
+        if matches!(self.selected_panel, Panels::SideBar) {
+            sb_color = Color::Yellow;
+            main_color = Color::White;
+        }
+
         let project_list = List::new(projects)
             .block(Block::default().title("Projects").borders(Borders::ALL))
-            .style(Style::default().fg(Color::White))
+            .style(Style::default().fg(sb_color))
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">>");
 
-        frame.render_stateful_widget(project_list, chunks[0], &mut self.projects.state);
+        frame.render_stateful_widget(project_list, sb_chunks[1], &mut self.projects.state);
 
-        let items_1 = &self.projects.items[self.projects.state.selected().unwrap_or(0)];
-
-        let project_items = items_1
+        let project_items = self
+            .item_list
+            .items
             .clone()
-            .dev_items
             .into_iter()
             .map(|d| ListItem::new(d.title))
             .collect::<Vec<ListItem>>();
 
         let project_list = List::new(project_items)
             .block(Block::default().title("Items").borders(Borders::ALL))
-            .style(Style::default().fg(Color::White))
+            .style(Style::default().fg(main_color))
             .highlight_style(Style::default().add_modifier(Modifier::ITALIC))
             .highlight_symbol(">>");
 
-        frame.render_stateful_widget(project_list, chunks[1], &mut self.projects.state);
+        frame.render_stateful_widget(project_list, chunks[1], &mut self.item_list.state);
     }
 }
