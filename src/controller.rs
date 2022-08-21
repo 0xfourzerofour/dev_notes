@@ -81,9 +81,10 @@ impl Controller {
     fn handle_normal_mode(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('i') => self.mode = InputMode::Insert,
-            // KeyCode::Char('j') | KeyCode::Down => self.handle_down(app),
-            // KeyCode::Char('k') | KeyCode::Up => self.handle_up(app),
-            KeyCode::Char('n') => self.insert_modal_visible = true,
+            KeyCode::Char('n') => {
+                self.insert_modal_visible = true;
+                self.toggle_mode();
+            }
             KeyCode::Tab => self.toggle_panel(),
             KeyCode::Char('d') | KeyCode::Char('D') => {
                 self.running = false;
