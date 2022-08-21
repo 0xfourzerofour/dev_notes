@@ -1,5 +1,5 @@
 use core::fmt::{Display, Formatter, Result};
-use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{KeyCode, KeyEvent};
 use std::io;
 
 use crate::{app::App, file_handler::load_projects, state::ProjectState};
@@ -31,6 +31,7 @@ pub struct Controller {
     pub selected_panel: Panels,
     pub running: bool,
     pub state: ProjectState,
+    pub insert_modal_visible: bool,
 }
 
 impl Controller {
@@ -42,6 +43,7 @@ impl Controller {
             selected_panel: Panels::SideBar,
             running: true,
             state: saved_projects,
+            insert_modal_visible: false,
         })
     }
 
@@ -81,10 +83,7 @@ impl Controller {
             KeyCode::Char('i') => self.mode = InputMode::Insert,
             // KeyCode::Char('j') | KeyCode::Down => self.handle_down(app),
             // KeyCode::Char('k') | KeyCode::Up => self.handle_up(app),
-            KeyCode::Char('n') => match self.selected_panel {
-                Panels::SideBar => println!("NEW PROJECT"),
-                Panels::NotePad => println!("NEW NOTE"),
-            },
+            KeyCode::Char('n') => self.insert_modal_visible = true,
             KeyCode::Tab => self.toggle_panel(),
             KeyCode::Char('d') | KeyCode::Char('D') => {
                 self.running = false;
@@ -93,35 +92,7 @@ impl Controller {
         }
     }
 
-    fn _handle_down(&self, _app: &mut App) {
-        // if matches!(self.selected_panel, Panels::SideBar) {
-        //     app.projects.next();
+    fn _handle_down(&self, _app: &mut App) {}
 
-        //     app.item_list.items = app.projects.items[app.projects.state.selected().unwrap_or(0)]
-        //         .dev_items
-        //         .clone();
-
-        //     app.item_list.state.select(Some(0));
-        // } else {
-        //     if app.item_list.items.len() > 0 {
-        //         app.item_list.next();
-        //     }
-        // }
-    }
-
-    fn _handle_up(&self, _app: &mut App) {
-        // if matches!(self.selected_panel, Panels::SideBar) {
-        //     app.projects.previous();
-
-        //     app.item_list.items = app.projects.items[app.projects.state.selected().unwrap_or(0)]
-        //         .dev_items
-        //         .clone();
-
-        //     app.item_list.state.select(Some(0));
-        // } else {
-        //     if app.item_list.items.len() > 0 {
-        //         app.item_list.previous();
-        //     }
-        // }
-    }
+    fn _handle_up(&self, _app: &mut App) {}
 }

@@ -13,9 +13,6 @@ pub mod tui;
 /// Terminal widgets.
 pub mod widgets;
 
-/// Terminal widgets.
-pub mod insert;
-
 pub mod controller;
 
 pub mod state;
