@@ -16,5 +16,11 @@ pub mod tui;
 /// Terminal widgets.
 pub mod widgets;
 
+/// Terminal widgets.
+pub mod insert;
+
 /// Event handler.
 pub mod handler;
+
+/// Event handler.
+pub mod movement;

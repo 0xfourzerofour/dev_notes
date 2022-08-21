@@ -1,10 +1,9 @@
 use core::fmt::{Display, Formatter, Result};
 use std::error;
-use std::mem::{replace, swap, take};
 use tui::backend::Backend;
-use tui::layout::{Alignment, Constraint, Direction, Layout};
 use tui::style::{Color, Modifier, Style};
 use tui::terminal::Frame;
+use tui::text::{Span, Spans};
 use tui::widgets::{Block, Borders, List, ListItem, Paragraph};
 
 use crate::projects::{Item, Project, StatefulList};
@@ -47,7 +46,6 @@ pub struct App {
 }
 
 impl App {
-    /// Constructs a new instance of [`App`].
     pub fn new(projects: Vec<Project>) -> Self {
         let proj_clone = projects.clone();
 
@@ -80,11 +78,17 @@ impl App {
 
         let items = self.projects.clone();
 
-        let projects = items
+        let projects: Vec<ListItem> = items
             .items
             .into_iter()
-            .map(|p| ListItem::new(p.title))
-            .collect::<Vec<ListItem>>();
+            .map(|p| {
+                let content = vec![Spans::from(vec![
+                    Span::raw(p.title),
+                    Span::raw(p.updated_at),
+                ])];
+                ListItem::new(content)
+            })
+            .collect();
 
         let mut sb_color = Color::White;
         let mut main_color = Color::Yellow;
