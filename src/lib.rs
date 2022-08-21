@@ -2,9 +2,6 @@
 pub mod app;
 
 /// Project implementations.
-pub mod projects;
-
-/// Project implementations.
 pub mod file_handler;
 
 /// Terminal events handler.
@@ -19,8 +16,6 @@ pub mod widgets;
 /// Terminal widgets.
 pub mod insert;
 
-/// Event handler.
-pub mod handler;
+pub mod controller;
 
-/// Event handler.
-pub mod movement;
+pub mod state;

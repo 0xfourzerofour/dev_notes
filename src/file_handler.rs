@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{app::AppResult, projects::Project};
+use crate::{app::AppResult, state::ProjectState};
 
 /// Application data and config files path
 struct ProjPaths {
@@ -29,7 +29,7 @@ lazy_static! {
     };
 }
 
-pub fn load_projects() -> Result<Vec<Project>, io::Error> {
+pub fn load_projects() -> Result<ProjectState, io::Error> {
     if !Path::new(PROJ_PATHS.data_path.as_path()).exists() {
         fs::File::create(PROJ_PATHS.data_path.as_path())?;
     }
@@ -40,30 +40,8 @@ pub fn load_projects() -> Result<Vec<Project>, io::Error> {
     Ok(projects)
 }
 
-pub fn save_projects(projects: &Vec<Project>) -> AppResult<()> {
-    let projs = Project::new(projects);
-
-    let stringified_projects = serde_json::to_string(projs)?;
+pub fn save_projects(projects: &ProjectState) -> AppResult<()> {
+    let stringified_projects = serde_json::to_string(projects)?;
     fs::write(PROJ_PATHS.data_path.as_path(), stringified_projects)?;
     Ok(())
 }
-
-// Load configs from the file and returns it, if there's no config set, returns default config
-// pub fn load_configs() -> Result<Configs, io::Error> {
-//     if !Path::new(PROJ_PATHS.config_path.as_path()).exists() {
-//         save_configs(&Configs::default()).unwrap();
-//     }
-
-//     let stringified_configs = fs::read_to_string(PROJ_PATHS.config_path.as_path())?;
-//     let configs: Configs = serde_json::from_str(&stringified_configs).unwrap();
-
-//     Ok(configs)
-// }
-
-// /// Save configs to file
-// fn save_configs(configs: &Configs) -> DynResult {
-//     let stringified_configs = serde_json::to_string_pretty(configs)?;
-//     fs::write(PROJ_PATHS.config_path.as_path(), stringified_configs)?;
-
-//     Ok(())
-// }
